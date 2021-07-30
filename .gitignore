@@ -2,3 +2,4 @@
 preview_mp3/*
 .vscode/*
 __pycache__/*
+.DS_Store
