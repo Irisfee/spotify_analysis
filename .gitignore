@@ -1,5 +1,7 @@
 # huge mp3 training data #
 preview_mp3/*
+jy_feat/*
+ex_data/*
 .vscode/*
 __pycache__/*
 .DS_Store
