@@ -9,53 +9,31 @@ from functools import partial
 from math import ceil
 from os import mkdir, path
 from shutil import rmtree
-
 import librosa
 import numpy as np
+import warnings
 
-
-class Params:
-    """
-    SY's parameters for MTT tagging
-    """
-    audio_len = 10
-    srt = 44100
-    wsz = 2048
-    mels = 128
-    hop_length = wsz / 4
-    feat_len = int(ceil(srt * audio_len / float(hop_length)))
-
+# librosa.load will always raise a warning, ignore it
+warnings.filterwarnings("ignore")
 
 class ParamsR:
-    """
-    Richard's parameters
-    """
+
     audio_len = 30
-    srt = 22050
-    wsz = 4096
+    srt = 22050 # default sample rate
+    wsz = 4096 # samples per frame 
     mels = 128
-    hop_length = wsz // 2
+    hop_length = wsz // 2 # determines the overlap between windows
     feat_len = int(ceil(srt * audio_len / float(hop_length)))
-
-
-class ParamsA2V:
-    """
-    SY's parameters for Audio2Vec
-    """
-    audio_len = 60
-    srt = 22050
-    wsz = 4096
-    mels = 128
-    hop_length = wsz / 2
-    feat_len = int(ceil(srt * audio_len / float(hop_length)))
-
 
 params = ParamsR
 
 
 def feat_extract(fn, out_p):
+
+    # get song id 
     sid = fn.split('/')[-1].split('.')[0]
 
+    # Extract audio timeseries
     try:
         y, _ = librosa.load(fn, sr=params.srt)
     except EOFError:
@@ -67,7 +45,8 @@ def feat_extract(fn, out_p):
     if song_len < params.audio_len / 2:
         # return -3  # less than a half
         pass
-
+    
+    # Compute a melody-scaled spectrogram, shape = (n_mels, t)
     feat = librosa.feature.melspectrogram(
         y=y, sr=params.srt, n_fft=params.wsz,
         hop_length=params.hop_length, n_mels=params.mels)
