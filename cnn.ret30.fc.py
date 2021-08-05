@@ -257,38 +257,38 @@ def tag_regression_clsf(tags, dr, mode):
     return logits_tag
 
 
-def a2v_regression_clsf(a2v, dr, mode):
-    dense1 = tf.layers.dropout(
-        inputs=tf.layers.dense(
-            inputs=a2v,
-            units=100,
-            activation=NON_LINEAR,
-            name='a2v_dense1'),
-        rate=dr,
-        training=(mode == learn.ModeKeys.TRAIN))
-    dense2 = tf.layers.dropout(
-        inputs=tf.layers.dense(
-            inputs=dense1,
-            units=100,
-            activation=NON_LINEAR,
-            name='a2v_dense2'),
-        rate=dr,
-        training=(mode == learn.ModeKeys.TRAIN))
-    dense3 = tf.layers.dropout(
-        inputs=tf.layers.dense(
-            inputs=dense2,
-            units=30,
-            activation=NON_LINEAR,
-            name='a2v_dense3'),
-        rate=dr,
-        training=(mode == learn.ModeKeys.TRAIN))
-    logits_a2v = tf.layers.dense(
-        inputs=dense3,
-        units=1,
-        activation=NON_LINEAR,
-        name='logits_a2v')
+# def a2v_regression_clsf(a2v, dr, mode):
+#     dense1 = tf.layers.dropout(
+#         inputs=tf.layers.dense(
+#             inputs=a2v,
+#             units=100,
+#             activation=NON_LINEAR,
+#             name='a2v_dense1'),
+#         rate=dr,
+#         training=(mode == learn.ModeKeys.TRAIN))
+#     dense2 = tf.layers.dropout(
+#         inputs=tf.layers.dense(
+#             inputs=dense1,
+#             units=100,
+#             activation=NON_LINEAR,
+#             name='a2v_dense2'),
+#         rate=dr,
+#         training=(mode == learn.ModeKeys.TRAIN))
+#     dense3 = tf.layers.dropout(
+#         inputs=tf.layers.dense(
+#             inputs=dense2,
+#             units=30,
+#             activation=NON_LINEAR,
+#             name='a2v_dense3'),
+#         rate=dr,
+#         training=(mode == learn.ModeKeys.TRAIN))
+#     logits_a2v = tf.layers.dense(
+#         inputs=dense3,
+#         units=1,
+#         activation=NON_LINEAR,
+#         name='logits_a2v')
 
-    return logits_a2v
+#     return logits_a2v
 
 
 def test_only(args):
@@ -651,10 +651,10 @@ def main():
         help='[jynet]|densenet|resnet', default='jynet')
     parser.add_argument(
         '-wt', '--tagging_loss_weight', default=0.5)
-    parser.add_argument(
-        '-a2v', '--use_a2v', action='store_true',
-        help='Use Audio2Vec (by SY) for training', default=False
-    )
+    # parser.add_argument(
+    #     '-a2v', '--use_a2v', action='store_true',
+    #     help='Use Audio2Vec (by SY) for training', default=False
+    # )
     parser.add_argument(
         '-wa2v', '--a2v_loss_weight', default=0.5)
     parser.add_argument(
@@ -753,15 +753,15 @@ def main():
             path.join(train_set, 'tgte.{}.npy'.format(tag_type)))
 
     train_a2v, test_a2v = None, None
-    if use_a2v:
-        flog.write('Use Audio2Vec.\n')
-        train_a2v = np.load(
-            path.join(train_set, 'a2vtr.npy'))
-        valid_a2v = np.load(
-            path.join(train_set, 'a2vva.npy'))
-        train_a2v = np.concatenate((train_a2v, valid_a2v), axis=0)
-        test_a2v = np.load(
-            path.join(train_set, 'a2vte.npy'))
+    # if use_a2v:
+    #     flog.write('Use Audio2Vec.\n')
+    #     train_a2v = np.load(
+    #         path.join(train_set, 'a2vtr.npy'))
+    #     valid_a2v = np.load(
+    #         path.join(train_set, 'a2vva.npy'))
+    #     train_a2v = np.concatenate((train_a2v, valid_a2v), axis=0)
+    #     test_a2v = np.load(
+    #         path.join(train_set, 'a2vte.npy'))
 
     x_f = tf.placeholder(tf.float32, [None, MEL_BIN, FRAME_NUM, 1])
     y_t = tf.placeholder(tf.float32, [None, y_size])
@@ -770,13 +770,13 @@ def main():
     tags, a2v = None, None
     if use_tag:
         tags = tf.placeholder(tf.float32, [None, TAG_SIZE])
-    if use_a2v:
-        a2v = tf.placeholder(tf.float32, [None, A2V_SIZE])
-    y_trd, y_ret = None, None
-    if 't' in stt:
-        y_trd = tf.placeholder(tf.float32, [None, TIMESPAN])
-    if 'r' in stt:
-        y_ret = tf.placeholder(tf.float32, [None, RET_TIMESPAN])
+    # if use_a2v:
+    #     a2v = tf.placeholder(tf.float32, [None, A2V_SIZE])
+    # y_trd, y_ret = None, None
+    # if 't' in stt:
+    #     y_trd = tf.placeholder(tf.float32, [None, TIMESPAN])
+    # if 'r' in stt:
+    #     y_ret = tf.placeholder(tf.float32, [None, RET_TIMESPAN])
 
     logits_all = None
     if model_type == 'incept':
@@ -789,25 +789,25 @@ def main():
             x_f, dr_rate, mode, stt)
 
     loss_trd = None
-    if 't' in stt:
-        loss_trd = tf.losses.mean_squared_error(
-            labels=y_trd,
-            predictions=logits_all['trd'])
+    # if 't' in stt:
+    #     loss_trd = tf.losses.mean_squared_error(
+    #         labels=y_trd,
+    #         predictions=logits_all['trd'])
 
-    loss_ret = None
-    if 'r' in stt:
-        loss_ret = tf.losses.mean_squared_error(
-            labels=y_ret,
-            predictions=logits_all['ret'])
+    # loss_ret = None
+    # if 'r' in stt:
+    #     loss_ret = tf.losses.mean_squared_error(
+    #         labels=y_ret,
+    #         predictions=logits_all['ret'])
 
     logits_tag, logits_a2v = 0, 0
     logits_pt = logits_all['pt']  # primary target(s)
     if use_tag:
         logits_tag = tag_regression_clsf(
             tags, dr_rate, mode)
-    if use_a2v:
-        logits_a2v = a2v_regression_clsf(
-            a2v, dr_rate, mode)
+    # if use_a2v:
+    #     logits_a2v = a2v_regression_clsf(
+    #         a2v, dr_rate, mode)
 
     if use_tag and use_a2v:
         logits_pt = loss_t_w * logits_tag + loss_a2v_w * logits_a2v + \
@@ -839,11 +839,11 @@ def main():
         optimizer = tf.train.AdagradOptimizer(
             learning_rate=lrt).minimize(loss)
 
-    tr_size = floor(data_num * TRAIN_SIZE)
-    ep_size = floor(data_num * TRAIN_SIZE / batch_size)  # steps per episode
-    val_start = tr_size + 1
-    val_end = floor(data_num * (TRAIN_SIZE + VAL_SIZE))
-    total_steps = ep_num * ep_size
+    tr_size = floor(data_num * TRAIN_SIZE) # total numbers of training items
+    ep_size = floor(data_num * TRAIN_SIZE / batch_size)  # steps per episode; number of batches per epoch
+    val_start = tr_size + 1 # starting point of val items
+    val_end = floor(data_num * (TRAIN_SIZE + VAL_SIZE)) # end point of val items
+    total_steps = ep_num * ep_size # total epoch number *  number of batches per epoch = total batches
     flog.write('total_steps: {:d}\n'.format(total_steps))
     init = tf.global_variables_initializer()
 
