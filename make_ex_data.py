@@ -33,14 +33,14 @@ def make_batch_feat(feat_fp_list, length=911):
     return feat
 
 
-dump_path = "ex_data/"
+dump_path = "tage_feature/ex_data/"
 if os.path.exists(dump_path):
     shutil.rmtree(dump_path)
 os.makedirs(dump_path)
 for win_size in [512, 1024,2048,4096,8192,16384]:
 
     #path
-    feat_dir = "jy_feat/out"+str(win_size)+"/"
+    feat_dir = "tag_feature/jy_feat/out"+str(win_size)+"/"
 
     #get files
     fn_list = []

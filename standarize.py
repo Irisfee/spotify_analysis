@@ -10,7 +10,7 @@ def standardize(feat, scaler=None):
     return out, scaler
 
 if __name__ == '__main__':
-    dump_path = "/Users/peetal/Documents/GitHub/spotify_analysis/std/"
+    dump_path = "/Users/peetal/Documents/GitHub/spotify_analysis/tag_feature/std/"
     
     if os.path.exists(dump_path):
         shutil.rmtree(dump_path)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     for size in [512,1024,2048,4096,8192,16384]:
         #path
-        feat_te_fp = 'ex_data/feat_test_' +str(size)+'.npy'
+        feat_te_fp = 'tag_feature/ex_data/feat_test_' +str(size)+'.npy'
 
         # standardize
         feat_te = np.load(feat_te_fp)

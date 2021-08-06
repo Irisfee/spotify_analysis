@@ -24,13 +24,13 @@ if __name__ == '__main__':
     diff_order = 0
 
     #remove this in future
-    if os.path.exists('jy_feat'):
-        shutil.rmtree('jy_feat')
-    os.mkdir('jy_feat')
+    if os.path.exists('./tag_feature/jy_feat'):
+        shutil.rmtree('./tag_feature/jy_feat')
+    os.mkdir('./tag_feature/jy_feat')
 
     for win_size in win_sizes:
-        path = "HL_output/audio/"
-        save_path = 'jy_feat/out'+str(win_size)+'/'
+        path = "data/preview_mp3/"
+        save_path = './tag_feature/jy_feat/out'+str(win_size)+'/'
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         for files in os.listdir(path):
