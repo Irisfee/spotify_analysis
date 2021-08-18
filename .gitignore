@@ -6,3 +6,4 @@ std/*
 .vscode/*
 __pycache__/*
 .DS_Store
+credential.yaml
