@@ -6,7 +6,6 @@ from math import floor, log2
 from os import fsync, mkdir, path
 from shutil import rmtree
 from sys import stdout
-
 import numpy as np
 import tensorflow as tf
 from scipy.stats import kendalltau, spearmanr
@@ -22,7 +21,7 @@ A2V_SIZE = 40
 DR = 0.25
 LR = 5e-3
 LR_DECAY = 0.9
-TRAIN_SIZE = 0.8  # 80% data for training
+TRAIN_SIZE = 0.9  # 80% data for training
 VAL_SIZE = 0.1
 TEST_SIZE = 1 - TRAIN_SIZE - VAL_SIZE
 W = 5
@@ -312,17 +311,18 @@ def test_only(args):
     flog = open(log_f, 'w')
     feat = np.load(
         path.join(train_set, 'feat.npy')).reshape(-1, MEL_BIN, FRAME_NUM, 1)
-    ids = np.load(path.join(train_set, 'id.feat.npy'))
+    ids = np.load(path.join(train_set, 'id.npy'))
     # trd = np.load(path.join(train_set, 'trend.feat.npy'))
-    ret = np.load(path.join(train_set, 'ret.feat.npy'))
+    ret = np.load(path.join(train_set, 'pop.npy'))
 
     # trd = -1 / np.log10(trd)
     # trd = norm(trd)
-    ret = norm(ret)
+#     ret = norm(ret)
 
     data_num = ids.size
 
-    tr_val = floor(data_num * (TRAIN_SIZE + VAL_SIZE))
+#     tr_val = floor(data_num * (TRAIN_SIZE + VAL_SIZE))
+    tr_val = floor(data_num * 0.9)
     teix = np.arange(tr_val, data_num)
     test_feat = np.take(feat, teix, axis=0)
     test_ids = np.take(ids, teix)
@@ -330,7 +330,7 @@ def test_only(args):
     test_ret = np.take(ret, teix, axis=0)
 
     # test_trd_last = test_trd[:, -1].reshape(-1, 1)
-    test_ret_30 = np.mean(test_ret, axis=1).reshape(-1, 1)
+    test_ret_30 = test_ret.reshape(-1, 1) 
 
     # timespan = test_trd.shape[1]
     # ret_timespan = None
@@ -411,8 +411,8 @@ def score_pred_only(args):
     dr_rate = float(args.dropout_rate)
     model_dir = '{}.mdl/'.format(args.output)
     loss_t_w = float(args.tagging_loss_weight)
-    pred_f = 'ret30.npy'
-    pred_emb = 'ret30.emb.npy'
+    pred_f = 'ret30_pred.npy'
+    pred_emb = 'ret30_pred.emb.npy'
 
     test_feat = np.load(
         path.join(train_set, 'xte.npy')).reshape(-1, MEL_BIN, FRAME_NUM, 1)
@@ -422,7 +422,7 @@ def score_pred_only(args):
     test_tags = None
     if use_tag:
         test_tags = np.load(
-            path.join(train_set, 'tgte.{}.npy'.format(tag_type)))
+            path.join(train_set, 'test_tgte.{}.npy'.format(tag_type)))
 
     x_f = tf.placeholder(tf.float32, [None, MEL_BIN, FRAME_NUM, 1])
     y_t = tf.placeholder(tf.float32, [None, y_size])
@@ -481,10 +481,12 @@ def score_pred_only(args):
             else:
                 test_embs = np.concatenate(
                     (test_embs, test_emb), axis=0)
-    # print (test_logitss)
-    print (denorm(test_logitss))
-    np.save(pred_f, denorm(test_logitss))
-    np.save(pred_emb, denorm(test_embs))
+    print (test_logitss)
+#     print (denorm(test_logitss))
+#     np.save(pred_f, denorm(test_logitss))
+#     np.save(pred_emb, denorm(test_embs))
+    np.save(pred_f, test_logitss)
+    np.save(pred_emb, test_embs)
     # np.save('{}.')
 
 
@@ -564,8 +566,10 @@ def test(model_dir, test_feat, test_pt, test_ids, test_tags, test_a2v,
         test_loss_overall = sum(test_losses) / len(test_losses)
         # test_ref *= NORM_FACTOR
 
-        overall_ref = denorm(test_pt)
-        overall_pred = denorm(test_logitss)
+#         overall_ref = denorm(test_pt)
+#         overall_pred = denorm(test_logitss)
+        overall_ref = test_pt
+        overall_pred = test_logitss
         overall_ref = overall_ref.reshape(-1)
         overall_pred = overall_pred.reshape(-1)
 
@@ -651,10 +655,10 @@ def main():
         help='[jynet]|densenet|resnet', default='jynet')
     parser.add_argument(
         '-wt', '--tagging_loss_weight', default=0.5)
-    # parser.add_argument(
-    #     '-a2v', '--use_a2v', action='store_true',
-    #     help='Use Audio2Vec (by SY) for training', default=False
-    # )
+    parser.add_argument(
+        '-a2v', '--use_a2v', action='store_true',
+        help='Use Audio2Vec (by SY) for training', default=False
+    )
     parser.add_argument(
         '-wa2v', '--a2v_loss_weight', default=0.5)
     parser.add_argument(
@@ -709,48 +713,49 @@ def main():
     feat = np.load(
         path.join(train_set, 'feat.npy')).reshape(-1, MEL_BIN, FRAME_NUM, 1)
     # 1,128,feat_len  --> data_num * MEL_BIN * FRAME_NUM * 1
-    ids = np.load(path.join(train_set, 'id.feat.npy'))
+    ids = np.load(path.join(train_set, 'id.npy'))
     # trd = np.load(path.join(train_set, 'trend.feat.npy'))
-    ret = np.load(path.join(train_set, 'ret.feat.npy')) # rank
+    ret = np.load(path.join(train_set, 'pop.npy')) # rank
 
     # trd = -1 / np.log10(trd)
     # trd = norm(trd)
-    ret = norm(ret)
+#     ret = norm(ret)
 
     data_num = ids.size
 
     tr_val = floor(data_num * (TRAIN_SIZE + VAL_SIZE))
     trix = np.arange(tr_val)
-    teix = np.arange(tr_val, data_num)
+#     teix = np.arange(tr_val, data_num)
     train_feat = np.take(feat, trix, axis=0)
-    test_feat = np.take(feat, teix, axis=0)
-    test_ids = np.take(ids, teix)
-    train_trd = np.take(trd, trix, axis=0)
+#     test_feat = np.take(feat, teix, axis=0)
+#     test_ids = np.take(ids, teix)
+#     train_trd = np.take(trd, trix, axis=0)
     # test_trd = np.take(trd, teix, axis=0)
     train_ret = np.take(ret, trix, axis=0)
-    test_ret = np.take(ret, teix, axis=0)
-
-    train_ret_30 = np.mean(train_ret, axis=1).reshape(-1, 1)
-    test_ret_30 = np.mean(test_ret, axis=1).reshape(-1, 1)
+#     test_ret = np.take(ret, teix, axis=0)
+    
+    train_ret_30 = train_ret.reshape(-1, 1) 
+#     train_ret_30 = np.mean(train_ret, axis=1).reshape(-1, 1)
+#     test_ret_30 = np.mean(test_ret, axis=1).reshape(-1, 1)
 
     # timespan = train_trd.shape[1]
     # ret_timespan = None
     train_pt, test_pt, y_size = None, None, 1
     train_pt = train_ret_30
-    test_pt = test_ret_30
+#     test_pt = test_ret_30
 
     train_tags, test_tags = None, None
     if use_tag:
         flog.write('Use tag from {}.\n'.format(tag_type))
         # all_tags = np.load(path.join(train_set, 'tg.npy'))
         train_tags = np.load(
-            path.join(train_set, 'tgtr.{}.npy'.format(tag_type)))
-        # valid_tags = np.take(all_tags, vaix, axis=0)
-        valid_tags = np.load(
-            path.join(train_set, 'tgva.{}.npy'.format(tag_type)))
-        train_tags = np.concatenate((train_tags, valid_tags), axis=0)
-        test_tags = np.load(
             path.join(train_set, 'tgte.{}.npy'.format(tag_type)))
+#         valid_tags = np.take(all_tags, vaix, axis=0)
+#         valid_tags = np.load(
+#             path.join(train_set, 'tgva.{}.npy'.format(tag_type)))
+#         train_tags = np.concatenate((train_tags, valid_tags), axis=0)
+#         test_tags = np.load(
+#             path.join(train_set, 'tgte.{}.npy'.format(tag_type)))
 
     train_a2v, test_a2v = None, None
     # if use_a2v:
@@ -912,10 +917,10 @@ def main():
                     current_lr *= LR_DECAY
 
                 if floor(step / ep_size) % 10 == 0:
-                    test(model_dir, test_feat, test_pt, test_ids, test_tags,
-                         test_a2v, teix, batch_size, loss_pt, logits_pt, x_f,
-                         y_t, tags, a2v, mode, flog, pred_f, stt, use_tag,
-                         use_a2v, prev_val_loss)
+#                     test(model_dir, test_feat, test_pt, test_ids, test_tags,
+#                          test_a2v, teix, batch_size, loss_pt, logits_pt, x_f,
+#                          y_t, tags, a2v, mode, flog, pred_f, stt, use_tag,
+#                          use_a2v, prev_val_loss)
                     if to_shuffle:
                         flog.write('Shuffling...\n')
                         np.random.shuffle(trix)
@@ -987,9 +992,9 @@ def main():
             fsync(flog.fileno())
 
     flog.write('---------------\n')
-    test(model_dir, test_feat, test_pt, test_ids, test_tags, test_a2v,
-         teix, batch_size, loss_pt, logits_pt, x_f, y_t, tags, a2v,
-         mode, flog, pred_f, stt, use_tag, use_a2v, prev_val_loss)
+#     test(model_dir, test_feat, test_pt, test_ids, test_tags, test_a2v,
+#          teix, batch_size, loss_pt, logits_pt, x_f, y_t, tags, a2v,
+#          mode, flog, pred_f, stt, use_tag, use_a2v, prev_val_loss)
     flog.close()
 
 

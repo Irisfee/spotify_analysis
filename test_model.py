@@ -36,7 +36,7 @@ if __name__ == '__main__':
     use_real_data = False
 
     # data_dir = '../data/HL30/standardize/'
-    data_dir = '/Users/peetal/Documents/GitHub/spotify_analysis/std/'
+    data_dir = '/gpfs/projects/hulacon/shared/nsd_results/yufei/spotify_analysis/tag_feature/std/'
 
     # Files
     param_fp = 'data/models/model.20160309_111546.npz'

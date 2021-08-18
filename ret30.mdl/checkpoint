@@ -1,0 +1,2 @@
+model_checkpoint_path: "/projects/hulacon/shared/nsd_results/yufei/spotify_analysis/ret30.mdl/model.ckpt"
+all_model_checkpoint_paths: "/projects/hulacon/shared/nsd_results/yufei/spotify_analysis/ret30.mdl/model.ckpt"

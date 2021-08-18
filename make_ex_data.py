@@ -18,11 +18,12 @@ def _append_zero_row(array, n_total_row):
     else:
         temp = np.zeros((n_total_row-r, c))
         return np.vstack([array, temp])
+    
 
-def make_batch_feat(feat_fp_list, length=911):
+def make_batch_feat(feat_fp_list, length=939):
     feat = []
     a_array = []
-    feat_fp_list.sort()
+    
     for idx, term in enumerate(feat_fp_list):
         # print(term)
         #np.load(term)
@@ -33,7 +34,8 @@ def make_batch_feat(feat_fp_list, length=911):
     return feat
 
 
-dump_path = "tage_feature/ex_data/"
+dump_path = "tag_feature/ex_data/"
+song_order_dir = 'test_data/id.npy'
 if os.path.exists(dump_path):
     shutil.rmtree(dump_path)
 os.makedirs(dump_path)
@@ -43,11 +45,13 @@ for win_size in [512, 1024,2048,4096,8192,16384]:
     feat_dir = "tag_feature/jy_feat/out"+str(win_size)+"/"
 
     #get files
-    fn_list = []
-    for files in os.listdir(feat_dir):
-        if files.endswith('.npy'):
-        	fn_list.append(files)
-    fn_list.sort()
+    #fn_list = []
+    #for files in os.listdir(feat_dir):
+    #    if files.endswith('.npy'):
+    #    	fn_list.append(files)
+    fn_list = [song + '.npy' for song in list(np.load(song_order_dir))]
+    
+    
 
     #make files
     feat_fp_list = [os.path.join(feat_dir, fn) for fn in fn_list]
@@ -55,4 +59,4 @@ for win_size in [512, 1024,2048,4096,8192,16384]:
 
     #save files
     np.save(dump_path + "feat_test_"+str(win_size)+".npy", feat)
-    np.save(dump_path + 'name.npy', fn_list)
+    np.save(dump_path + f'{win_size}_name.npy', fn_list)

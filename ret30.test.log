@@ -1,0 +1,12 @@
+Model type: Inception CNN.
+Testing MSE: 8.284525e+01
+Overall RMSE: 9.100276e+00
+
+Recall@100: 8
+Recall@150: 15
+nDCG@150: 0.357029
+Kendall tau@150: 0.137177
+Spearman rho@150: 0.200782
+Kendall tau: 0.249132
+Spearman rho: 0.349767
+

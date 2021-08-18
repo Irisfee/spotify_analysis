@@ -28,41 +28,36 @@ class ParamsR:
 params = ParamsR
 
 
-def feat_extract(fn, out_p):
-
+def _feat_extract(fn, out_p):
+    
     # get song id 
     sid = fn.split('/')[-1].split('.')[0]
 
-    # Extract audio timeseries
-    try:
-        y, _ = librosa.load(fn, sr=params.srt)
-    except EOFError:
-        return -2
-        
+    # Extract audio timeseries    
+    y, sr = librosa.load(fn, sr=params.srt)
     song_len = len(y) / float(params.srt)
-    if song_len == 0:
-        return -2  # read file error
-    if song_len < params.audio_len / 2:
-        # return -3  # less than a half
-        pass
-    
+
+    if song_len < params.audio_len/2:
+        print(sid)
+        
     # Compute a melody-scaled spectrogram, shape = (n_mels, t)
     feat = librosa.feature.melspectrogram(
         y=y, sr=params.srt, n_fft=params.wsz,
         hop_length=params.hop_length, n_mels=params.mels)
     if song_len == params.audio_len:
         ret = feat
-    elif song_len > params.audio_len:
+    elif song_len > params.audio_len: # select the middle 30s portion 
         start = feat.shape[1] // 2 - params.feat_len // 2
         end = feat.shape[1] // 2 + params.feat_len // 2
         if params.feat_len % 2 == 1:
             end += 1
         ret = feat[:, start:end]
-    else:
+    else: # padd it 
         ret = np.zeros((params.mels, params.feat_len))
         ret[:, :feat.shape[1]] = feat.copy()
     np.save(
         path.join(out_p, sid), ret.reshape(1, params.mels, params.feat_len))
+    
     return 0  # success
 
 
@@ -82,10 +77,12 @@ def main():
     mkdir(feat_dir)
 
     songs = glob.glob('{}/*mp3'.format(song_dir))
-    pool = multiprocessing.Pool(30)
-    excpt = pool.map(partial(feat_extract, out_p=feat_dir), songs[:])
+    pool = multiprocessing.Pool(28)
+    excpt = pool.map(partial(_feat_extract, out_p=feat_dir), songs[:])
     pool.close()
     pool.join()
+    #for fn in songs: 
+    #    _feat_extract(fn, out_p=feat_dir)
 
 
 if __name__ == "__main__":

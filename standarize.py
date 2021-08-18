@@ -10,7 +10,7 @@ def standardize(feat, scaler=None):
     return out, scaler
 
 if __name__ == '__main__':
-    dump_path = "/Users/peetal/Documents/GitHub/spotify_analysis/tag_feature/std/"
+    dump_path = "/gpfs/projects/hulacon/shared/nsd_results/yufei/spotify_analysis/tag_feature/std/"
     
     if os.path.exists(dump_path):
         shutil.rmtree(dump_path)

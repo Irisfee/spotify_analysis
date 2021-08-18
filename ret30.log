@@ -1,0 +1,31 @@
+Use tag from jynet.
+Model type: Inception CNN.
+total_steps: 83120
+ep 1.000000 passed. LR: 0.005000
+  training loss: 83.953772
+  validation loss: 80.217669
+ep 2.000120 passed. LR: 0.005000
+  training loss: 78.815970
+  validation loss: 79.487088
+ep 3.000120 passed. LR: 0.005000
+  training loss: 77.991055
+  validation loss: 79.013144
+ep 4.000241 passed. LR: 0.005000
+  training loss: 77.305150
+  validation loss: 78.662102
+ep 5.000241 passed. LR: 0.005000
+  training loss: 76.736997
+  validation loss: 78.390060
+ep 6.000361 passed. LR: 0.005000
+  training loss: 76.151498
+  validation loss: 78.048581
+ep 7.000361 passed. LR: 0.005000
+  training loss: 75.630798
+  validation loss: 77.784922
+ep 8.000481 passed. LR: 0.005000
+  training loss: 75.055396
+  validation loss: 77.549701
+ep 9.000481 passed. LR: 0.005000
+  training loss: 74.508094
+  validation loss: 77.392060
+---------------
