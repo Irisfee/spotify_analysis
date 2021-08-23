@@ -7,3 +7,4 @@ std/*
 __pycache__/*
 .DS_Store
 credential.yaml
+ret30.mdl.results/*
