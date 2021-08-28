@@ -15,6 +15,7 @@
 - We accomplished this through the pipeline shown below. We will debrief each step of the pipeline in sections down below.
 
 <img src="Building%20API%20for%20Predicting%20Mando-pop%20Popularity%2000db7035e3ff4ef185883cdba69de8a0/Screen_Shot_2021-08-22_at_7.53.07_PM.png" alt="drawing" width="1000"/>
+
 ## 2. Get-ready: explore data, benchmark baseline model
 
 ### Query data with Spotify API
